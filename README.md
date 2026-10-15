@@ -60,7 +60,9 @@ Base URL: `http://localhost:3001/api/v1`
 
 ## What "completed" means in my game
 
-A player is considered completed when their finished_at timestamp is not null. A game is considered finished when its status is CLOSED and it has an ended_at timestamp.
+### What "completed" means in my game
+
+A player is considered completed when their `finished_at` value in the `players` table is not NULL. If `finished_at` is NULL, the player has not completed the game. The results endpoint returns `completed: true` for completed players and `completed: false` for players who did not finish.
 
 ## Tables
 
