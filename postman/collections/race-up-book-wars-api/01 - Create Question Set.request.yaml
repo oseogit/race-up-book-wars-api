@@ -1,0 +1,37 @@
+$kind: http-request
+url: "{{baseUrl}}/question-sets"
+method: POST
+headers:
+  X-Demo-User: "{{host}}"
+body:
+  type: json
+  content: "{\r
+
+    \    \"title\": \"Delete Test\",\r
+
+    \    \"description\": \"Temporary question set for DELETE testing.\",\r
+
+    \    \"subject\": \"General Knowledge\",\r
+
+    \    \"grade_level\": \"College\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status is 201\", function () {\r
+
+      \    pm.response.to.have.status(201);\r
+
+      });\r
+
+      \r
+
+      pm.collectionVariables.set(\r
+
+      \    \"setId\",\r
+
+      \    pm.response.json().question_set.set_id\r
+
+      );"
+    language: text/javascript
+order: 6000
