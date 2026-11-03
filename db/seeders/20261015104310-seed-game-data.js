@@ -1,4 +1,9 @@
-    // 1. Create fictional accounts.
+'use strict';
+
+module.exports = {
+  async up(queryInterface) {
+    const now = new Date();
+
     await queryInterface.bulkInsert('users', [
       {
         nickname: 'host_demo',
@@ -71,3 +76,23 @@
         updated_at: now,
       },
     ]);
+  },
+
+  async down(queryInterface) {
+    await queryInterface.bulkDelete(
+      'users',
+      {
+        nickname: [
+          'host_demo',
+          'student_one',
+          'student_two',
+          'student_three',
+          'student_four',
+          'never_joined',
+          'host_other_demo',
+        ],
+      },
+      {}
+    );
+  },
+};
