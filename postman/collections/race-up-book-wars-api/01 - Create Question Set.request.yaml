@@ -5,33 +5,25 @@ headers:
   X-Demo-User: "{{host}}"
 body:
   type: json
-  content: "{\r
-
-    \    \"title\": \"Delete Test\",\r
-
-    \    \"description\": \"Temporary question set for DELETE testing.\",\r
-
-    \    \"subject\": \"General Knowledge\",\r
-
-    \    \"grade_level\": \"College\"\r
-
-    }"
+  content: |-
+    {
+      "title": "Library Rules Quiz",
+      "description": "Temporary question set used by the Postman run.",
+      "subject": "Library Science",
+      "grade_level": "College"
+    }
 scripts:
   - type: afterResponse
-    code: "pm.test(\"Status is 201\", function () {\r
+    code: |-
+      pm.test("status is 201", function () {
+        pm.response.to.have.status(201);
+      });
 
-      \    pm.response.to.have.status(201);\r
+      pm.test("the new set has an id", function () {
+        pm.expect(pm.response.json().question_set.set_id).to.be.a("number");
+      });
 
-      });\r
-
-      \r
-
-      pm.collectionVariables.set(\r
-
-      \    \"setId\",\r
-
-      \    pm.response.json().question_set.set_id\r
-
-      );"
+      // the requests that follow use this id
+      pm.collectionVariables.set("setId", pm.response.json().question_set.set_id);
     language: text/javascript
-order: 6000
+order: 1000

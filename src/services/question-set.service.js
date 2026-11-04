@@ -1,70 +1,54 @@
+// The rules of Module 1. A service says no by THROWING one of the kit's errors.
+// It never touches req or res.
+const questionSetRepository = require('../repositories/question-set.repository');
+const { notFound, forbidden } = require('../errors/app-error');
 
-const repository = require('../repositories/question-set.repository');
+const NOT_YOURS = 'This question set belongs to another host.';
 
-const create = async (data, user) => {
-  return repository.create({
-    ...data,
-    host_user_id: user.user_id,
-  });
-};
-
-const findAll = async (user) => {
-  return repository.findAllByHost(user.user_id);
-};
-
-const findOne = async (setId, user) => {
-  const questionSet = await repository.findById(setId);
-
+async function findOrFail(id) {
+  const questionSet = await questionSetRepository.findById(id);
   if (!questionSet) {
-    const error = new Error('Question set not found.');
-    error.status = 404;
-    error.code = 'QUESTION_SET_NOT_FOUND';
-    throw error;
+    throw notFound('QUESTION_SET_NOT_FOUND', `No question set has the id ${id}.`);
   }
-
-  if (questionSet.host_user_id !== user.user_id) {
-    const error = new Error('You do not own this question set.');
-    error.status = 403;
-    error.code = 'FORBIDDEN';
-    throw error;
-  }
-
   return questionSet;
-};
+}
 
-const update = async (setId, data, user) => {
-  await findOne(setId, user);
+function isOwner(questionSet, user) {
+  return questionSet.host_user_id === user.user_id || user.role === 'ADMIN';
+}
 
-  await repository.update(setId, data);
+// Rule: a host sees their own sets. An admin sees every set.
+function list(user) {
+  return user.role === 'ADMIN'
+    ? questionSetRepository.findAll()
+    : questionSetRepository.findAllByHost(user.user_id);
+}
 
-  return repository.findById(setId);
-};
+// Rule: a set can be read by its owner or by an admin.
+async function get(id, user) {
+  const questionSet = await findOrFail(id);
+  if (!isOwner(questionSet, user)) throw forbidden(NOT_YOURS);
+  return questionSet;
+}
 
-const remove = async (setId, user) => {
-  await findOne(setId, user);
+// Rule: the owner is the caller. A client can never choose host_user_id.
+function create(data, user) {
+  return questionSetRepository.create({ ...data, host_user_id: user.user_id });
+}
 
-  try {
-    return await repository.remove(setId);
-  } catch (err) {
-    if (err.parent?.code === '23001') {
-      const error = new Error(
-        'Cannot delete this question set because it is being used by a game session.'
-      );
+// Rule: only the owner (or an admin) may change a set.
+async function update(id, changes, user) {
+  const questionSet = await findOrFail(id);
+  if (!isOwner(questionSet, user)) throw forbidden(NOT_YOURS);
+  return questionSetRepository.update(questionSet, changes);
+}
 
-      error.status = 409;
-      error.code = 'QUESTION_SET_IN_USE';
+// Rule: only the owner (or an admin) may delete a set. If a game still uses it,
+// the foreign key stops the delete and constraint-map.js turns that into a 409.
+async function remove(id, user) {
+  const questionSet = await findOrFail(id);
+  if (!isOwner(questionSet, user)) throw forbidden(NOT_YOURS);
+  await questionSetRepository.remove(questionSet);
+}
 
-      throw error;
-    }
-
-    throw err;
-  }
-};
-
-module.exports = {
-  create,
-  findAll,
-  findOne,
-  update,
-  remove,
-};
+module.exports = { list, get, create, update, remove };

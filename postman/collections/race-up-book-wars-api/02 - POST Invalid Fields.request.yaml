@@ -5,23 +5,26 @@ headers:
   X-Demo-User: "{{host}}"
 body:
   type: json
-  content: "{\r
-
-    \    \"title\": \"\",\r
-
-    \    \"description\": \"\",\r
-
-    \    \"subject\": \"\",\r
-
-    \    \"grade_level\": \"\"\r
-
-    }"
+  content: |-
+    {
+      "title": "ab",
+      "subject": 12345,
+      "grade_level": "College"
+    }
 scripts:
   - type: afterResponse
-    code: "pm.test(\"Status is 400\", function () {\r
+    code: |-
+      pm.test("status is 400", function () {
+        pm.response.to.have.status(400);
+      });
 
-      \    pm.response.to.have.status(400);\r
+      pm.test("error code is VALIDATION_FAILED", function () {
+        pm.expect(pm.response.json().error.code).to.eql("VALIDATION_FAILED");
+      });
 
-      });"
+      pm.test("details name the fields", function () {
+        const fields = pm.response.json().error.details.map((d) => d.field);
+        pm.expect(fields).to.include.members(["title", "subject"]);
+      });
     language: text/javascript
-order: 5000
+order: 2000

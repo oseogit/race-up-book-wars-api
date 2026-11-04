@@ -1,31 +1,32 @@
+// The only file that queries question_sets. No decisions here: it returns a
+// row, a list, or null, and the service decides what that means.
 const { QuestionSet } = require('../models');
 
-const create = (data) => QuestionSet.create(data);
+function findAll() {
+  return QuestionSet.findAll({ order: [['set_id', 'ASC']] });
+}
 
-const findAllByHost = (hostUserId) =>
-  QuestionSet.findAll({
+function findAllByHost(hostUserId) {
+  return QuestionSet.findAll({
     where: { host_user_id: hostUserId },
     order: [['set_id', 'ASC']],
   });
+}
 
-const findById = (setId) =>
-  QuestionSet.findByPk(setId);
+function findById(setId) {
+  return QuestionSet.findByPk(setId); // a row, or null
+}
 
-const update = (setId, data) =>
-  QuestionSet.update(data, {
-    where: { set_id: setId },
-    returning: true,
-  });
+function create(data) {
+  return QuestionSet.create(data);
+}
 
-const remove = (setId) =>
-  QuestionSet.destroy({
-    where: { set_id: setId },
-  });
+function update(questionSet, changes) {
+  return questionSet.update(changes);
+}
 
-module.exports = {
-  create,
-  findAllByHost,
-  findById,
-  update,
-  remove,
-};
+function remove(questionSet) {
+  return questionSet.destroy();
+}
+
+module.exports = { findAll, findAllByHost, findById, create, update, remove };
