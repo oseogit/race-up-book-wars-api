@@ -2,7 +2,7 @@ $kind: http-request
 url: "{{baseUrl}}/question-sets/1"
 method: GET
 headers:
-  X-Demo-User: "{{host}}"
+  X-Demo-User: 2099-0001
 scripts:
   - type: afterResponse
     code: "pm.test(\"Status is 200\", function () {\r

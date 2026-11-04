@@ -1,8 +1,8 @@
 $kind: http-request
-url: "{{baseUrl}}/question-sets/2"
+url: "{{baseUrl}}/question-sets/1"
 method: DELETE
 headers:
-  X-Demo-User: "{{host}}"
+  X-Demo-User: 2099-0001
 scripts:
   - type: afterResponse
     code: "pm.test(\"Status is 204\", function () {\r
