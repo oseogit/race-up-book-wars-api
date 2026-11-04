@@ -1,7 +1,7 @@
 {
   "name": "race-up-book-wars-api",
   "version": "1.0.0",
-  "description": "Books Wars, a multiplayer game where players answer questions and get mystery books to climb shelves and compete against apponents.",
+  "description": "Book Wars, a multiplayer game where players answer questions and get mystery books to climb shelves and compete against opponents.",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

@@ -2,14 +2,18 @@ $kind: http-request
 url: "{{baseUrl}}/question-sets"
 method: GET
 headers:
-  X-Demo-User: 2099-0001
+  X-Demo-User: "{{host}}"
 scripts:
   - type: afterResponse
-    code: "pm.test(\"Status is 200\", function () {\r
+    code: |-
+      pm.test("status is 200", function () {
+        pm.response.to.have.status(200);
+      });
 
-      \    pm.response.to.have.status(200);\r
-
-      });"
+      pm.test("the body holds a list that contains the new set", function () {
+        const sets = pm.response.json().question_sets;
+        pm.expect(sets).to.be.an("array");
+        pm.expect(sets.map((s) => String(s.set_id))).to.include(String(pm.collectionVariables.get("setId")));
+      });
     language: text/javascript
-examples: .resources/06 - List Question Sets.resources/examples
-order: 1000
+order: 6000

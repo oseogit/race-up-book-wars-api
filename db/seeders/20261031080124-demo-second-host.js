@@ -8,7 +8,7 @@ module.exports = {
       {
         nickname: 'host_second',
         password_hash: 'demo_hash_not_for_login',
-        school_id: '2099-0007',
+        school_id: '2099-0008',
         full_name: 'Demo Host Two',
         email: 'host2@demo.test',
         role: 'HOST',
