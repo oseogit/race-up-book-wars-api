@@ -1,0 +1,13 @@
+$kind: http-request
+url: http://localhost:3001/api/v1/sessions/808422/players
+method: POST
+headers:
+  X-Demo-User: 2099-0007
+body:
+  type: json
+  content: "{\r
+
+    \  \"nickname\": \"PlayerTwo\"\r
+
+    }"
+order: 5000

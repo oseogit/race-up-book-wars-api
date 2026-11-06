@@ -1,0 +1,9 @@
+$kind: http-request
+url: http://localhost:3001/api/v1/sessions/554083
+method: PATCH
+headers:
+  X-Demo-User: 2099-0001
+body:
+  type: json
+  content: "{\r\n  \"status\": \"CLOSED\"\r\n}"
+order: 4000

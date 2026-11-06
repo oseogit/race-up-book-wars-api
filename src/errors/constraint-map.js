@@ -1,10 +1,10 @@
-// A database rule was broken -> what the client should hear.
-// The key is the constraint name from YOUR migration. PostgreSQL names a
-// foreign key "<table>_<column>_fkey" when the migration does not name it.
-// A constraint that is not listed here still answers 409, with the code CONFLICT.
 module.exports = {
-  // game_sessions.set_id -> question_sets.set_id, ON DELETE RESTRICT:
-  // a set that a game used cannot be deleted.
+  players_session_id_user_id_unique: {
+    status: 409,
+    code: 'PLAYER_ALREADY_JOINED',
+    message: 'This player has already joined the session.',
+  },
+
   game_sessions_set_id_fkey: {
     status: 409,
     code: 'QUESTION_SET_IN_USE',
