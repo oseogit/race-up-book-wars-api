@@ -37,8 +37,8 @@ const nickname = () => body('nickname')
   .isString().withMessage('nickname must be text')
   .bail()
   .trim()
-  .isLength({ min: 1, max: 50 })
-  .withMessage('nickname must be 1 to 50 characters');
+  .isLength({ min: 2, max: 50 })
+  .withMessage('nickname must be 2 to 50 characters');
 
 const joinPlayerRules = [joinCodeParam, nickname()];
 const updateSessionRules = [joinCodeParam, status()];

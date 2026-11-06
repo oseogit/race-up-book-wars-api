@@ -1,0 +1,33 @@
+$kind: http-request
+url: http://localhost:3001/api/v1/sessions
+method: POST
+headers:
+  X-Demo-User: 2099-0001
+body:
+  type: json
+  content: "{\r
+
+    \  \"set_id\": 1,\r
+
+    \  \"time_limit_sec\": 600\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.collectionVariables.set(\r
+
+      \    \"code\",\r
+
+      \    pm.response.json().session.join_code\r
+
+      );\r
+
+      \r
+
+      pm.test(\"Host starts a game - 201\", function () {\r
+
+      \    pm.response.to.have.status(201);\r
+
+      });"
+    language: text/javascript
+order: 2000

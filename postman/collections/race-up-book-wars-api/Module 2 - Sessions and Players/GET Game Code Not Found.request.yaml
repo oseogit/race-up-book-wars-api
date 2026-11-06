@@ -1,0 +1,14 @@
+$kind: http-request
+url: http://localhost:3001/api/v1/sessions/999999
+method: GET
+headers:
+  Accept: application/json
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Game code not found - 404\", function () {\r
+
+      \    pm.response.to.have.status(404);\r
+
+      });"
+    language: text/javascript
+order: 12000

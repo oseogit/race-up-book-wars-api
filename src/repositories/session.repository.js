@@ -39,6 +39,15 @@ function findPlayerBySessionAndUser(sessionId, userId) {
   });
 }
 
+function findPlayerBySessionAndNickname(sessionId, nickname) {
+  return Player.findOne({
+    where: {
+      session_id: sessionId,
+      nickname,
+    },
+  });
+}
+
 function createPlayer(data) {
   return Player.create(data);
 }
@@ -54,6 +63,7 @@ module.exports = {
   findPlayersBySession,
   countPlayersBySession,
   findPlayerBySessionAndUser,
+  findPlayerBySessionAndNickname,
   createPlayer,
   updatePlayer,
 };

@@ -1,8 +1,8 @@
 $kind: http-request
-url: http://localhost:3001/api/v1/sessions/808422/players
+url: "{{baseUrl}}/sessions/{{code}}/players"
 method: POST
 headers:
-  X-Demo-User: 2099-0001
+  X-Demo-User: 2099-0007
 body:
   type: json
   content: "{\r
@@ -10,4 +10,12 @@ body:
     \  \"nickname\": \"PlayerOne\"\r
 
     }"
-order: 2000
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Player joins - 201\", function () {\r
+
+      \    pm.response.to.have.status(201);\r
+
+      });"
+    language: text/javascript
+order: 3000

@@ -112,6 +112,19 @@ async function joinSession(code, data, user) {
     );
   }
 
+  const existingNickname =
+    await sessionRepository.findPlayerBySessionAndNickname(
+      session.session_id,
+      data.nickname
+    );
+
+  if (existingNickname) {
+    throw conflict(
+      'DUPLICATE_NICKNAME',
+      'This nickname is already taken in this session.'
+    );
+  }
+
   const playerCount = await sessionRepository.countPlayersBySession(
     session.session_id
   );

@@ -1,9 +1,17 @@
 $kind: http-request
-url: http://localhost:3001/api/v1/sessions/808422
+url: "{{baseUrl}}/sessions/{{code}}"
 method: PATCH
 headers:
   X-Demo-User: 2099-0001
 body:
   type: json
-  content: "{\r\n  \"status\": \"RUNNING\"\r\n}"
-order: 7000
+  content: "{\r\n  \"status\": \"CLOSED\"\r\n}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Close session - 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });"
+    language: text/javascript
+order: 11000

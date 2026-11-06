@@ -1,0 +1,14 @@
+$kind: http-request
+url: http://localhost:3001/api/v1/sessions/123
+method: GET
+headers:
+  Accept: application/json
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Invalid game code - 400\", function () {\r
+
+      \    pm.response.to.have.status(400);\r
+
+      });"
+    language: text/javascript
+order: 13000
