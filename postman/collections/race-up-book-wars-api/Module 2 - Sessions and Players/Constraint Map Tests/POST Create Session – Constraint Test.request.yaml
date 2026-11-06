@@ -1,0 +1,15 @@
+$kind: http-request
+url: http://localhost:3001/api/v1/sessions
+method: POST
+headers:
+  X-Demo-User: 2099-0001
+body:
+  type: json
+  content: "{\r
+
+    \  \"set_id\": 4,\r
+
+    \  \"time_limit_sec\": 600\r
+
+    }"
+order: 2000

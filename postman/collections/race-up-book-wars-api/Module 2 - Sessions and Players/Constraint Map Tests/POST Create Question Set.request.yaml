@@ -1,0 +1,19 @@
+$kind: http-request
+url: http://localhost:3001/api/v1/question-sets
+method: POST
+headers:
+  X-Demo-User: 2099-0001
+body:
+  type: json
+  content: "{\r
+
+    \  \"title\": \"Constraint Test\",\r
+
+    \  \"description\": \"Temporary test question set.\",\r
+
+    \  \"subject\": \"General Knowledge\",\r
+
+    \  \"grade_level\": \"College\"\r
+
+    }"
+order: 1000

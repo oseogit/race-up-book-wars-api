@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:3001/api/v1/question-sets/4
+method: DELETE
+headers:
+  X-Demo-User: 2099-0001
+order: 3000
