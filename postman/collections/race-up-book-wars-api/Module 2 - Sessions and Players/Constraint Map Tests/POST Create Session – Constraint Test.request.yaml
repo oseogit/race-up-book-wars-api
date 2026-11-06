@@ -7,7 +7,7 @@ body:
   type: json
   content: "{\r
 
-    \  \"set_id\": 4,\r
+    \  \"set_id\": 6,\r
 
     \  \"time_limit_sec\": 600\r
 

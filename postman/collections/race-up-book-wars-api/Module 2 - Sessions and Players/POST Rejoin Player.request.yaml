@@ -1,8 +1,8 @@
 $kind: http-request
-url: http://localhost:3001/api/v1/sessions/808422/players
+url: http://localhost:3001/api/v1/sessions/{{code}}/players
 method: POST
 headers:
-  X-Demo-User: 2099-0001
+  X-Demo-User: 2099-0007
 body:
   type: json
   content: "{\r
@@ -10,4 +10,4 @@ body:
     \  \"nickname\": \"PlayerOne\"\r
 
     }"
-order: 3000
+order: 6000
