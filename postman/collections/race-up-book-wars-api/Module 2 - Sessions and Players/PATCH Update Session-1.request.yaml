@@ -1,0 +1,18 @@
+$kind: http-request
+name: PATCH Update Session
+url: http://localhost:3001/api/v1/sessions/654191
+method: PATCH
+headers:
+  X-Demo-User: 2099-0001
+body:
+  type: json
+  content: "{\r\n  \"status\": \"RUNNING\"\r\n}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Invalid status transition - 409\", function () {\r
+
+      \    pm.response.to.have.status(409);\r
+
+      });"
+    language: text/javascript
+order: 7011
