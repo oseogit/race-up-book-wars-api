@@ -149,7 +149,7 @@ Use the appropriate `X-Demo-User` header when testing protected endpoints.
 
 The Postman collection is located at:
 
-`postman/collections/race-up-book-wars-api`
+`postman/collections/race-up-book-wars-api.postman_collection.json`
 
 It contains the Hub Contract tests, Module 1 Question Sets tests, and Module 2 Sessions and Players tests.
 
