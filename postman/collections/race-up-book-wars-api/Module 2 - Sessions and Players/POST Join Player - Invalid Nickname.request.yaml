@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/sessions/{{code}}/players"
+method: POST
+headers:
+  X-Demo-User: 2099-0008
+body:
+  type: json
+  content: "{\r\n  \"nickname\": \"A\"\r\n}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Invalid nickname - 400\", function () {\r
+
+      \    pm.response.to.have.status(400);\r
+
+      });"
+    language: text/javascript
+order: 5000

@@ -1,14 +1,15 @@
-# [Race Up: Book Wars] API
+# Race Up: Book Wars API
 
-Backend API for **[Race Up: Book Wars]**, a tournament game for the SorSU Bulan Campus library.
-CS 313 Software Engineering 1, A.Y. 2026-2027.
+Backend API for **Race Up: Book Wars**, a tournament game for the SorSU Bulan Campus library.
 
-- Developer: [Ria Angela Oseo] ([oseogit]), BSCS [3-2]
-- Group and game concept: [Team 9]
+CS 313 Software Engineering 1, A.Y. 2026–2027.
 
-This is my own build of my group's game concept. Every commit in this repository was made by me, with Git, on my own computer or in my own Codespace.
+- **Developer:** Ria Angela Oseo (`oseogit`), BSCS 3-2
+- **Group and game concept:** Team 9
 
-## Tech stack
+This is my own build of my group's game concept. Every commit in this repository was made by me, using Git on my own computer or in my own Codespace.
+
+## Tech Stack
 
 | Layer | Tool |
 |---|---|
@@ -19,71 +20,171 @@ This is my own build of my group's game concept. Every commit in this repository
 
 ## Setup
 
-```
+```bash
 git clone https://github.com/oseogit/race-up-book-wars-api.git
 cd race-up-book-wars-api
 npm install
 ```
 
-Copy `.env.example` to `.env`, then put your own PostgreSQL password in `DB_PASSWORD`.
+Copy `.env.example` to `.env`, then enter your own PostgreSQL password in `DB_PASSWORD`.
 
-```
-npm run db:create     (first time only)
+```bash
+npm run db:create
 npm run db:migrate
 npm run db:seed
 npm run db:check
 npm run dev
 ```
 
-## Environment variables
+To start again from a known state (empty database, all tables rebuilt, and seed data loaded):
+
+```bash
+npm run db:reset
+```
+
+## Environment Variables
 
 | Key | Example | Purpose |
 |---|---|---|
-| NODE_ENV | development | Which config block to use |
-| PORT | 3001 | Port the API listens on (the library assigns the final port at deployment) |
+| NODE_ENV | development | Configuration environment |
+| PORT | 3001 | Port the API listens on |
 | DB_HOST | 127.0.0.1 | PostgreSQL host |
 | DB_PORT | 5432 | PostgreSQL port |
 | DB_NAME | Race_Up_Book_Wars | Database name |
 | DB_USER | postgres | Database user |
-| DB_PASSWORD | (your own) | Database password. Never commit this. |
-| HUB_API_KEY | dev-hub-key | Key the Library Game Hub sends to read results. The library gives the real one at deployment. |
+| DB_PASSWORD | (your own) | PostgreSQL password. Never commit this. |
+| HUB_API_KEY | dev-hub-key | Key used by the Library Game Hub to read results |
 
-## Endpoints (Hub Contract v1.2)
+## API Endpoints
 
 Base URL: `http://localhost:3001/api/v1`
 
-| Method | Path | Purpose | Success |
-|---|---|---|---|
-| GET | /health | Is the API up and can it reach the database? | 200 (503 when the database is down) |
-| GET | /game-info | Slug, name, group, developer, description, player limits, version | 200 |
-| GET | /results | Finished games, every player, and the top 3. Needs the `X-Hub-Key` header. Optional `?since=` | 200 (401 without the key) |
+### Hub Contract v1.2
 
-## What "completed" means in my game
+| Method | Path | Purpose | Who May Call It | Success |
+|---|---|---|---|---|
+| GET | `/health` | Check API and database availability | Anyone | 200 (503 if database is unavailable) |
+| GET | `/game-info` | Get game information and player limits | Anyone | 200 |
+| GET | `/results` | Get finished games, player results, and top 3 players. Supports optional `?since=` | Library Game Hub (`X-Hub-Key` required) | 200 (401 without key) |
 
-### What "completed" means in my game
+### Module 1: Question Sets (Week 11)
 
-A player is considered completed when their `finished_at` value in the `players` table is not NULL. If `finished_at` is NULL, the player has not completed the game. The results endpoint returns `completed: true` for completed players and `completed: false` for players who did not finish.
+Until login is implemented in Week 12, identify the caller using the `X-Demo-User: <school ID>` header. This is temporary demo authentication, not security.
 
-## Tables
+| Method | Path | Purpose | Who May Call It | Success |
+|---|---|---|---|---|
+| GET | `/question-sets` | List the caller's question sets; ADMIN can see all | HOST, ADMIN | 200 |
+| GET | `/question-sets/{id}` | Read one question set | Owner or ADMIN | 200 |
+| POST | `/question-sets` | Create a question set | HOST, ADMIN | 201 |
+| PATCH | `/question-sets/{id}` | Update one or more question-set fields | Owner or ADMIN | 200 |
+| DELETE | `/question-sets/{id}` | Delete a question set that has not been used by a game | Owner or ADMIN | 204 |
 
-users
-question_sets
-questions
-game_sessions
-players
-answers
-player_question_progress
-leaderboard
-book_effects
-retry_pool
+### Module 2: Sessions and Players (Week 11)
 
-## Database scripts
+Requests use the temporary `X-Demo-User: <school ID>` header until login is implemented in Week 12.
 
-| Command | What it does |
+| Method | Path | Purpose | Who May Call It | Success |
+|---|---|---|---|---|
+| POST | `/sessions` | Create a game session | HOST, ADMIN | 201 |
+| GET | `/sessions/{code}` | Read session details using its join code | Anyone | 200 |
+| PATCH | `/sessions/{code}` | Update session status | Session host, ADMIN | 200 |
+| POST | `/sessions/{code}/players` | Join or rejoin a game using a nickname | Authenticated user | 201 (new player), 200 (rejoin) |
+| GET | `/sessions/{code}/players` | List players in a session | Anyone | 200 |
+
+#### Session Rules
+
+- Only HOST or ADMIN users can create sessions.
+- The question set must belong to the host, unless the caller is an ADMIN.
+- Only the session host or an ADMIN can update a session.
+- New players can join only while the session status is `WAITING`.
+- Existing players can rejoin using the same join endpoint, even if the session is no longer accepting new players.
+- A session can have a maximum of 20 players.
+- Nicknames must be unique within the same session.
+
+#### Allowed Session Status Transitions
+
+- `WAITING` → `RUNNING`
+- `WAITING` → `CLOSED`
+- `RUNNING` → `CLOSED`
+
+Invalid status transitions return `409 Conflict`.
+
+### Error Responses
+
+Errors use this format:
+
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Description of the error"
+  }
+}
+```
+
+Common responses:
+
+| Status | Meaning |
 |---|---|
-| npm run db:migrate | Runs migrations that have not run yet |
-| npm run db:migrate:status | Lists every migration as up or down |
-| npm run db:seed | Loads the seed data |
-| npm run db:check | Counts the rows in every table |
-| npm run db:reset | Empties the database, rebuilds every table and reloads the seed data |
-| npm run check | Runs the same automatic check that GitHub runs after every push |
+| 400 | Invalid request data |
+| 401 | Missing or invalid Hub key |
+| 403 | Caller is not allowed to perform the action |
+| 404 | Requested resource or game code was not found |
+| 409 | Conflict, such as duplicate nickname, question set in use, or invalid status transition |
+| 503 | Database is unavailable |
+
+### Test Accounts
+
+Seeded demo accounts:
+
+| Role | School ID |
+|---|---|
+| Host | `2099-0001` |
+| Other host | `2099-0007` |
+| Third host | `2099-0008` |
+
+Use the appropriate `X-Demo-User` header when testing protected endpoints.
+
+### Postman Collection
+
+The Postman collection is located at:
+
+`postman/collections/race-up-book-wars-api.postman_collection.json`
+
+It contains the Hub Contract tests, Module 1 Question Sets tests, and Module 2 Sessions and Players tests.
+
+### What Completed Means
+
+- API starts successfully.
+- Database migrations and seeders run successfully.
+- Hub Contract endpoints return the expected responses.
+- Module 1 CRUD operations and validation tests pass.
+- Module 2 session and player tests pass.
+- Error handling returns consistent responses.
+- Postman collection tests pass from a known database state.
+
+### Database Tables
+
+The database includes:
+
+- `users`
+- `question_sets`
+- `questions`
+- `game_sessions`
+- `players`
+- `answers`
+- `player_question_progress`
+- `leaderboard`
+- `book_effects`
+- `retry_pool`
+
+### Database Scripts
+
+| Command | Purpose |
+|---|---|
+| `npm run db:create` | Create the development database |
+| `npm run db:migrate` | Run pending migrations |
+| `npm run db:seed` | Load seed data |
+| `npm run db:check` | Check database tables and records |
+| `npm run db:reset` | Rebuild the database and reload seed data |
+

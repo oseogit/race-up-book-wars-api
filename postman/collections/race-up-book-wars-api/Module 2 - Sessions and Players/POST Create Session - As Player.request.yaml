@@ -1,0 +1,23 @@
+$kind: http-request
+url: http://localhost:3001/api/v1/sessions
+method: POST
+headers:
+  X-Demo-User: 2099-0007
+body:
+  type: json
+  content: "{\r
+
+    \  \"set_id\": 1,\r
+
+    \  \"time_limit_sec\": 600\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Player cannot start a game - 403\", function () {\r
+
+      \    pm.response.to.have.status(403);\r
+
+      });"
+    language: text/javascript
+order: 1000

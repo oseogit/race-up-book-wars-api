@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/question-sets"
+method: POST
+headers:
+  X-Demo-User: "{{host}}"
+body:
+  type: json
+  content: |-
+    {
+      "title": "Science Basics",
+      "description":
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("status is 400", function () {
+        pm.response.to.have.status(400);
+      });
+
+      pm.test("error code is INVALID_JSON", function () {
+        pm.expect(pm.response.json().error.code).to.eql("INVALID_JSON");
+      });
+    language: text/javascript
+order: 3000
